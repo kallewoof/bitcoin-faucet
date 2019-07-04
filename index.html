@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><%- faucetName %></title>
+</head>
+<body>
+    <h1><%- faucetName %></h1>
+    <form method="post" action="/claim">
+        <div>
+            <b>Enter an address:</b>
+        </div>
+        <div>
+            <input type="text" name="address" id="address" placeholder="sb1qblablabla"/>
+        </div>
+        <div>
+            <button type="submit">Request</button>
+        </div>
+    </form>
+</body>
+</html>

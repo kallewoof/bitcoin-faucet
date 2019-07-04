@@ -19,5 +19,13 @@
   "bugs": {
     "url": "https://github.com/kallewoof/bitcoin-faucet/issues"
   },
-  "homepage": "https://github.com/kallewoof/bitcoin-faucet#readme"
+  "homepage": "https://github.com/kallewoof/bitcoin-faucet#readme",
+  "dependencies": {
+    "bcrpc": "^0.2.1",
+    "body-parser": "^1.19.0",
+    "ejs": "^2.6.2",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "mongodb": "^3.2.7"
+  }
 }
