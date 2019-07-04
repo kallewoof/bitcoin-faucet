@@ -71,8 +71,8 @@ app.post('/claim', (req, res) => {
         if (address.match(/^[a-zA-Z0-9]+$/) === null) return res.send('Invalid address');
         calc_payout((err2, amount) => {
             if (err2) return res.send(err2);
-            // model.visitor.visit(ipaddr, 'faucet', (err3) => {
-                // if (err3) return res.send('Nuh-uh');
+            model.visitor.visit(ipaddr, 'faucet', (err3) => {
+                if (err3) return res.send('Nuh-uh');
                 bitcoin.sendToAddress(address, sat2BTC(amount), (err4, result) => {
                     console.log(`send ${amount} to ${address} ${JSON.stringify(err4)} ${JSON.stringify(result)}`);
                     if (err4) return res.send('Internal error');
@@ -80,7 +80,7 @@ app.post('/claim', (req, res) => {
                         res.send(`Payment of ${sat2BTC(amount)} BTC sent with txid ${result.result}`);
                     });
                 });
-            // });
+            });
         });
     });
 });
