@@ -14,7 +14,7 @@ const model = {
             db.find('visitor', { ip, category }, (err, res) => {
                 console.log(`[DDoS:${category}]: ${ip} => ${res.length}`);
                 if (err) return cb("Internal error");
-                if (res.length > maxreqs) return cb("Too many requests, try again later");
+                if (res.length >= maxreqs) return cb("Too many requests, try again later");
                 cb();
             });
         });
@@ -27,7 +27,7 @@ const model = {
             db.find('visitor', { ip, category }, (err, res) => {
                 console.log(`[DDoS:${category}]: ${ip} => ${res.length}`);
                 if (err) return cb("internal error");
-                if (res.length > maxreqs) return cb("Too many requests, try again later");
+                if (res.length >= maxreqs) return cb("Too many requests, try again later");
                 db.insert(
                     'visitor',
                     { ip, category, seen },
