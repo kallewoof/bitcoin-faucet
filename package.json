@@ -1,0 +1,23 @@
+{
+  "name": "bitcoin-faucet",
+  "version": "0.0.1",
+  "description": "Simple Bitcoin Faucet",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kallewoof/bitcoin-faucet.git"
+  },
+  "keywords": [
+    "bitcoin",
+    "faucet"
+  ],
+  "author": "Karl-Johan Alm",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kallewoof/bitcoin-faucet/issues"
+  },
+  "homepage": "https://github.com/kallewoof/bitcoin-faucet#readme"
+}
