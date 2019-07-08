@@ -16,6 +16,25 @@ const model = {
     claim: require('./models/claim'),
 };
 
+const check = (req, res, cb) => {
+    const fs = require('fs');
+    const ip = req.headers["x-real-ip"];
+    if (!ip || `{ip}` === "undefined") {
+        return cb('Internal error (IP)');
+    }
+    if (!fs.existsSync('banned.txt')) return cb(null);
+    const lr = require('readline').createInterface({
+        input:fs.createReadStream('banned.txt')
+    });
+    lr.on('line', (l) => {
+        console.log(`line='${l}' vs '${ip}`);
+        if (l === ip) {
+            return cb('Internal error');
+        }
+    });
+    lr.on('close', () => cb(null));
+};
+
 const render = (req, res, filebasename, data) => {
     ejs.renderFile(`${filebasename}.html`, data || {}, {}, (err, html) => {
         if (err) {
@@ -29,12 +48,15 @@ const render = (req, res, filebasename, data) => {
     });
 };
 
-const connect = (cb) => {
-    if (!db.connected) {
-        db.connect((err) => {
-            return cb(err ? 'Internal error (connection failure)' : null);
-        });
-    } else cb(null);
+const connect = (req, res, cb) => {
+    check(req, res, (err) => {
+        if (err) return cb(err);
+        if (!db.connected) {
+            db.connect((err) => {
+                return cb(err ? 'Internal error (connection failure)' : null);
+            });
+        } else cb(null);
+    });
 };
 
 const calc_payout = (cb) => {
@@ -52,7 +74,7 @@ app.use(session({
 }));
 
 app.get('/', (req, res) => {
-    connect((err) => {
+    connect(req, res, (err) => {
         if (err) return res.send(err);
         const ipaddr = req.headers["x-real-ip"];
         model.visitor.check(ipaddr, 'faucet', (err2) => {
@@ -63,7 +85,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/claim', (req, res) => {
-    connect((err) => {
+    connect(req, res, (err) => {
         if (err) return res.send(err);
         const ipaddr = req.headers["x-real-ip"];
         const { address } = req.body;
