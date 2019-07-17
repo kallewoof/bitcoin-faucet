@@ -18,6 +18,8 @@ const model = {
 
 const check = (req, res, cb) => {
     const fs = require('fs');
+    if (config.faucetPassword) return cb(null); // we don't support banning when password is enabled
+
     const ip = req.headers["x-real-ip"];
     if (!ip || `{ip}` === "undefined") {
         return cb('Internal error (IP)');
