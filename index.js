@@ -102,7 +102,7 @@ app.post('/claim', (req, res) => {
         if (address.match(/^[a-zA-Z0-9]+$/) === null) return res.send('Invalid address');
         calc_payout((err2, amount) => {
             if (err2) return res.send(err2);
-            visitorVisit(ipaddr, 'faucet', (err3) => {
+            visitorVisit(req, res, ipaddr, 'faucet', (err3) => {
                 if (err3) return res.send('Nuh-uh');
                 bitcoin.sendToAddress(address, sat2BTC(amount), (err4, result) => {
                     console.log(`send ${amount} to ${address} ${JSON.stringify(err4)} ${JSON.stringify(result)}`);
