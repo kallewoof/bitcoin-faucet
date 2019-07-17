@@ -13,6 +13,9 @@ const config = {
     // faucet name (e.g. "Bitcoin Faucet") -- here it is set to Signet Faucet, and above rpcport is
     // the default signet port
     faucetName: process.env.FAUCET_NAME || "Signet Faucet",
+    // two options: rate limiting via IP address, OR rate limiting by requiring a pass phrase
+    // if faucetPassword is unset, IP rate limiting is enforced, otherwise it is not
+    faucetPassword: process.env.FAUCET_PASSWORD,
     // several maximums in place to prevent someone from claiming too much too quickly
     faucetHourMax: (process.env.FAUCET_HOUR_MAX || 100) * BTC,
     faucetDayMax: (process.env.FAUCET_DAY_MAX || 1000) * BTC,

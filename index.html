@@ -14,6 +14,14 @@
         <div>
             <input type="text" name="address" id="address" placeholder="sb1qblablabla"/>
         </div>
+<% if (faucetUsePass) { %>
+        <div>
+            <b>Enter faucet password:</b>
+        </div>
+        <div>
+            <input type="password" name="password" id="password"/>
+        </div>
+<% } %>
         <div>
             <button type="submit">Request</button>
         </div>

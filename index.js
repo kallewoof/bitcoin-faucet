@@ -63,6 +63,19 @@ const calc_payout = (cb) => {
     model.claim.calc_amount(cb);
 }
 
+// let visitorCheck;
+let visitorVisit;
+if (config.faucetPassword) {
+    // visitorCheck = 
+    visitorVisit = (req, res, ipaddr, category, cb) => {
+        const { password } = req.body;
+        cb(password === config.faucetPassword ? null : "invalid password");
+    };
+} else {
+    // visitorCheck = (req, res, ipaddr, category, cb) => model.visitor.check(ipaddr, category, cb);
+    visitorVisit = (req, res, ipaddr, category, cb) => model.visitor.visit(ipaddr, category, cb);
+}
+
 const sat2BTC = (sat) => Number(sat / 100000000).toFixed(8);
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -76,11 +89,7 @@ app.use(session({
 app.get('/', (req, res) => {
     connect(req, res, (err) => {
         if (err) return res.send(err);
-        const ipaddr = req.headers["x-real-ip"];
-        model.visitor.check(ipaddr, 'faucet', (err2) => {
-            if (err2) return res.send(err);
-            render(req, res, 'index', { faucetName: config.faucetName });
-        });
+        render(req, res, 'index', { faucetName: config.faucetName, faucetUsePass: config.faucetPassword ? true : false });
     });
 });
 
@@ -93,7 +102,7 @@ app.post('/claim', (req, res) => {
         if (address.match(/^[a-zA-Z0-9]+$/) === null) return res.send('Invalid address');
         calc_payout((err2, amount) => {
             if (err2) return res.send(err2);
-            model.visitor.visit(ipaddr, 'faucet', (err3) => {
+            visitorVisit(ipaddr, 'faucet', (err3) => {
                 if (err3) return res.send('Nuh-uh');
                 bitcoin.sendToAddress(address, sat2BTC(amount), (err4, result) => {
                     console.log(`send ${amount} to ${address} ${JSON.stringify(err4)} ${JSON.stringify(result)}`);
