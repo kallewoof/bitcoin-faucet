@@ -5,11 +5,14 @@ const config = {
     bitcoind: {
         host: process.env.BITCOIND_HOST || 'localhost',
         port: process.env.BITCOIND_PORT || 38332,
+        user: process.env.BITCOIND_USER,
+        pass: process.env.BITCOIND_PASS,
         cookie: process.env.BITCOIND_COOKIE,
     },
+    mongoHost: process.env.MONGODB_HOST || 'localhost',
     // faucet name (e.g. "Bitcoin Faucet") -- here it is set to Signet Faucet, and above rpcport is
     // the default signet port
-    faucetName: "Signet Faucet",
+    faucetName: process.env.FAUCET_NAME || "Signet Faucet",
     // several maximums in place to prevent someone from claiming too much too quickly
     faucetHourMax: 100 * BTC,
     faucetDayMax: 1000 * BTC,

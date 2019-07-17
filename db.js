@@ -1,7 +1,8 @@
 const { MongoClient, ObjectID } = require('mongodb');
 const assert = require('assert');
+const config = require('./config');
 
-const url = 'mongodb://localhost:27017';
+const url = `mongodb://${config.mongoHost}:27017`;
 const dbname = 'bitcoin-faucet';
 
 module.exports = {
