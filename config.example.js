@@ -14,11 +14,11 @@ const config = {
     // the default signet port
     faucetName: process.env.FAUCET_NAME || "Signet Faucet",
     // several maximums in place to prevent someone from claiming too much too quickly
-    faucetHourMax: process.env.FAUCET_HOUR_MAX || 100 * BTC,
-    faucetDayMax: process.env.FAUCET_DAY_MAX || 1000 * BTC,
-    faucetWeekMax: process.env.FAUCET_WEEK_MAX || 2000 * BTC,
+    faucetHourMax: (process.env.FAUCET_HOUR_MAX || 100) * BTC,
+    faucetDayMax: (process.env.FAUCET_DAY_MAX || 1000) * BTC,
+    faucetWeekMax: (process.env.FAUCET_WEEK_MAX || 2000) * BTC,
     // we will not pay out less than the minimum, and will tell users to wait awhile
-    faucetMin: process.env.FAUCET_MIN || 100 * mBTC,
+    faucetMin: (process.env.FAUCET_MIN || 100) * mBTC,
     // we expect 10 people to claim coins from the faucet each hour, so we will by default
     // send (hour remaining coins)/10 coins, with a lower cap of faucetMin
     faucetHourSplit: process.env.FAUCET_HOUR_SPLIT || 10,
