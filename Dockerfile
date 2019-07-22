@@ -3,13 +3,13 @@
 FROM debian:stretch-slim
 
 # TODO: weed out unnecessary deps
-RUN apt-get -y update \
-    && apt-get -y install \
+RUN apt-get -yq update \
+    && apt-get -yq install \
         curl
 
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 
-RUN apt-get -y install nodejs
+RUN apt-get -yq install nodejs
 
 RUN mkdir -p /srv/faucet
 
