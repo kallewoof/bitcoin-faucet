@@ -12,7 +12,7 @@ const model = {
         const expiry = seen - 86400000;
         db.remove('visitor', { seen: { $lt: expiry }}, (err) => {
             db.find('visitor', { ip, category }, (err, res) => {
-                console.log(`[DDoS:${category}]: ${ip} => ${res.length}`);
+                console.log(`${new Date()} [DDoS:${category}]: ${ip} == ${res.length}${res.length >= maxreqs ? `>=` : `<`} ${maxreqs}`);
                 if (err) return cb("Internal error");
                 if (res.length >= maxreqs) return cb("Too many requests, try again later");
                 cb();
@@ -25,7 +25,7 @@ const model = {
         const expiry = seen - 86400000;
         db.remove('visitor', { seen: { $lt: expiry }}, (err) => {
             db.find('visitor', { ip, category }, (err, res) => {
-                console.log(`[DDoS:${category}]: ${ip} => ${res.length}`);
+                console.log(`${new Date()} [DDoS:${category}]: ${ip} == ${res.length}${res.length >= maxreqs ? `>=` : `<`} ${maxreqs}`);
                 if (err) return cb("internal error");
                 if (res.length >= maxreqs) return cb("Too many requests, try again later");
                 db.insert(
