@@ -100,6 +100,7 @@ app.post('/claim', (req, res) => {
         if (err) return res.send(err);
         const ipaddr = req.headers["x-real-ip"];
         const { address } = req.body;
+        if (!address) return res.send('Missing address');
         if (address.length < 10 || address.length > 50) return res.send('Invalid address');
         if (address.match(/^[a-zA-Z0-9]+$/) === null) return res.send('Invalid address');
         calc_payout((err2, amount) => {
