@@ -29,8 +29,8 @@ const check = (req, res, cb) => {
         input:fs.createReadStream('banned.txt')
     });
     let ok = true;
+    console.log(`${new Date()} :: ${ip}`)
     lr.on('line', (l) => {
-        console.log(`line='${l}' vs '${ip}`);
         if (l === ip) {
             ok = false;
             return cb('Internal error');
