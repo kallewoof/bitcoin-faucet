@@ -28,13 +28,15 @@ const check = (req, res, cb) => {
     const lr = require('readline').createInterface({
         input:fs.createReadStream('banned.txt')
     });
+    let ok = true;
     lr.on('line', (l) => {
         console.log(`line='${l}' vs '${ip}`);
         if (l === ip) {
+            ok = false;
             return cb('Internal error');
         }
     });
-    lr.on('close', () => cb(null));
+    lr.on('close', () => !ok || cb(null));
 };
 
 const render = (req, res, filebasename, data) => {
