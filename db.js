@@ -61,10 +61,14 @@ module.exports = {
     },
     remove(coll, query, cb = null) {
         this.db.collection(coll).deleteOne(query, (err, results) => {
-            if (cb)
-                cb(err, results);
-            else
-                assert.equal(null, err);
+            if (cb) cb(err, results);
+            else assert(!err);
         });
     },
+    removeAll(coll, query, cb = null) {
+        this.db.collection(coll).deleteMany(query, (err, results) => {
+            if (cb) cb(err, results);
+            else assert(!err);
+        });
+    }
 };

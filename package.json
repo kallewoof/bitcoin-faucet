@@ -26,6 +26,7 @@
     "ejs": "^2.6.2",
     "express": "^4.17.1",
     "express-session": "^1.16.2",
-    "mongodb": "^3.2.7"
+    "mongodb": "^3.2.7",
+    "svg-captcha": "^1.4.0"
   }
 }
