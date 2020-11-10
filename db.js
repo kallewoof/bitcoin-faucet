@@ -11,8 +11,8 @@ module.exports = {
     },
     connect(cb) {
         assert(!this.connected);
-        MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
-            assert.equal(null, err);
+        MongoClient.connect(url, { useUnifiedTopology: true, useNewUrlParser: true }, (err, client) => {
+            assert(err === null);
             this.connected = true;
             this.db = client.db(dbname);
             cb(err);
