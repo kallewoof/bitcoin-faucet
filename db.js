@@ -11,8 +11,8 @@ module.exports = {
     },
     connect(cb) {
         assert(!this.connected);
-        MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
-            assert.equal(null, err);
+        MongoClient.connect(url, { useUnifiedTopology: true, useNewUrlParser: true }, (err, client) => {
+            assert(err === null);
             this.connected = true;
             this.db = client.db(dbname);
             cb(err);
@@ -61,10 +61,14 @@ module.exports = {
     },
     remove(coll, query, cb = null) {
         this.db.collection(coll).deleteOne(query, (err, results) => {
-            if (cb)
-                cb(err, results);
-            else
-                assert.equal(null, err);
+            if (cb) cb(err, results);
+            else assert(!err);
         });
     },
+    removeAll(coll, query, cb = null) {
+        this.db.collection(coll).deleteMany(query, (err, results) => {
+            if (cb) cb(err, results);
+            else assert(!err);
+        });
+    }
 };
