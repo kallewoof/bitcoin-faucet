@@ -25,7 +25,7 @@ const config = {
     // we expect 10 people to claim coins from the faucet each hour, so we will by default
     // send (hour remaining coins)/10 coins, with a lower cap of faucetMin
     faucetHourSplit: process.env.FAUCET_HOUR_SPLIT || 10,
-    explorerUrl: process.env.EXPLORER_URL || "https://explorer.bc-2.jp/tx/%TXID%",
+    explorerUrl: process.env.EXPLORER_URL || "https://explorer.bc-2.jp/tx/",
 };
 
 module.exports = config;
