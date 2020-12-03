@@ -153,15 +153,18 @@ let claim = (params, req, res) => {
         if (err) return res.status(400).send({ message: err });
         visitorCheck(req, params, 'faucet', (err, count) => {
             if (err) return res.status(400).send({ message: err });
+
             const requireCaptcha = count > 0;
-            if (req.session.captcha) {
-                if (req.session.captcha === 'reload') return res.status(400).send("Captcha expired; please reload")
-                if (params.captcha !== req.session.captcha) {
-                    return res.status(400).send("Captcha answer incorrect");
+            if (requireCaptcha) {
+                if (req.session.captcha) {
+                    if (req.session.captcha === 'reload') return res.status(400).send("Captcha expired; please reload")
+                    if (params.captcha !== req.session.captcha) {
+                        return res.status(400).send("Captcha answer incorrect");
+                    }
+                    req.session.captcha = 'reload';
+                } else {
+                    return res.status(400).send("Captcha required (reload page)");
                 }
-                req.session.captcha = 'reload';
-            } else if (requireCaptcha) {
-                return res.status(400).send("Captcha required (reload page)");
             }
 
             const ipaddr = req.headers["x-real-ip"];
