@@ -174,7 +174,7 @@ let claim = (params, req, res) => {
             if (!amount) amount = "0.001";
             // btc -> sat
             amount = btcString2Sat(amount);
-            if (amount < 100000 || amount > 1000000) return res.status(400).send('Please check your amount and try again.');
+            if (amount < 100000 || amount > 10000000) return res.status(400).send('Please check your amount and try again.');
             calc_payout((err2, amount2) => {
                 if (err2) return res.status(400).send({ message: err2 });
                 if (amount2 < amount) amount = amount2;
