@@ -4,7 +4,7 @@ const assert = require('assert');
 // glob is automatically incremented for all requests; it has a high limit (500 requests) but over a longer timespan (7 days)
 // it is meant to prevent abuse where someone makes a bot to connect incessantly over longer periods of time
 const category_limits = {
-    faucet: 10000000,       // 0.1 btc
+    faucet: 100000000,       // 1 btc
     glob: 500,
 };
 
