@@ -13,7 +13,7 @@ const model = {
         this.calc_max((err, max) => {
             if (err) return cb(err);
             let amount = max / config.faucetHourSplit;
-            if (amount < config.faucetMin) amount = faucetMin;
+            if (amount < config.faucetMin) amount = config.faucetMin;
             if (amount > max) return cb('Internal error'); // this should never occur due to pre-existing checks in calc_limit()
             cb(null, amount);
         });
