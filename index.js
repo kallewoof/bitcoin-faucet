@@ -168,9 +168,9 @@ let claim = (params, req, res) => {
             }
 
             const ipaddr = req.headers["x-real-ip"];
-            if (address.length < 10 || address.length > 50) return res.status(400).send({ message: 'Invalid address' });
-            if (address.match(/^[a-zA-Z0-9]+$/) === null) return res.status(400).send({ message: 'Invalid address' });
             if (!address) return res.status(400).send({ message: 'Missing address' });
+            if (address.length < 10 || address.length > 100) return res.status(400).send({ message: 'Invalid address' });
+            if (address.match(/^[a-zA-Z0-9]+$/) === null) return res.status(400).send({ message: 'Invalid address' });
             if (!amount) amount = "0.001";
             // btc -> sat
             amount = btcString2Sat(amount);
