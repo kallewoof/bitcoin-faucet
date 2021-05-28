@@ -146,7 +146,6 @@ const get = async (req: Request, res: Response, subpath: string): Promise<Respon
         faucetUsePass: config.faucetPassword ? true : false,
         explorerUrl: config.explorerUrl
     });
-    console.log('- request done');
 }
 
 // captcha
