@@ -101,13 +101,13 @@ if (config.faucetPassword) {
 } else {
     visitorCount = async (req: Request) => {
         const rl: rlf.RateLimiterRes | null = await rlfFaucet.get(req.headers["x-real-ip"] as string);
-        return rl?.consumedPoints || 0;
+        return rl ? rl.consumedPoints : 0;
     }
     visitorVisit = async (req: Request, _params: MixedData, weight?: number) => {
         const addr = req.headers["x-real-ip"] as string;
         await rlfGlob.consume(addr, 1);
         const rl = await rlfFaucet.consume(addr, weight);
-        return rl?.consumedPoints || 0;
+        return rl.consumedPoints;
     }
 }
 
