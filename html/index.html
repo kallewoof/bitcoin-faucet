@@ -32,10 +32,16 @@
                 if (!captcha) return faucet_err("Solve captcha");
                 url += `/${escape(captcha)}`;
             <% } %>
+            const div = document.getElementById('faucet_err');
+            div.className = "";
+            div.innerHTML = "- processing -";
+            const sendButton = document.getElementById('sendButton');
+            sendButton.disabled = true;
             $.ajax({
                 url,
                 type: 'GET',
                 success: function(data) {
+                    sendButton.disabled = false;
                     // replace txid with explorer link
                     let comps = data.split("txid ");
                     console.log(`comps = ${comps}`);
@@ -51,6 +57,7 @@
                     <% } %>
                 },
                 error: function(err) {
+                    sendButton.disabled = false;
                     faucet_err(JSON.stringify(err));
                     var msg = "";
                     if (err.status) {
@@ -132,7 +139,7 @@
                                 </div>
                             <% } %>
 
-                            <button onclick="javascript:faucet_fetch();" class="button is-primary is-fullwidth has-margin-top-25">Send</button>
+                            <button id="sendButton" onclick="javascript:faucet_fetch();" class="button is-primary is-fullwidth has-margin-top-25">Send</button>
                         </div> 
                     </div>
                 </div>
