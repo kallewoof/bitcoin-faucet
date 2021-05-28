@@ -40,12 +40,12 @@ const rlfGlob = new rlf.RateLimiterMemory(rlfGlobOpts);
 
 const check = async (req: Request, _res: Response) => {
     if (config.faucetPassword) return; // we don't support banning when password is enabled
+    if (!fs.existsSync('banned.txt')) return;
 
     const ip = req.headers["x-real-ip"];
     if (!ip || `${ip}` === "undefined") {
         throw new Error('Internal error (IP)');
     }
-    if (!fs.existsSync('banned.txt')) return;
     const lr = require('readline').createInterface({
         input:fs.createReadStream('banned.txt')
     });
@@ -60,7 +60,7 @@ const check = async (req: Request, _res: Response) => {
 }
 
 const render = (_req: Request, res: Response, filebasename: string, data: MixedData) => {
-    const filename = `html/${filebasename.includes('.') ? filebasename : `${filebasename}.html`}`;
+    const filename = `../html/${filebasename.includes('.') ? filebasename : `${filebasename}.html`}`;
     if (!fs.existsSync(filename)) {
         res.status(400).send({ message: 'file not found' });
         return;
@@ -133,7 +133,12 @@ app.use(session({
 
 const get = async (req: Request, res: Response, subpath: string): Promise<Response | void> => {
     if (subpath.includes('..')) return res.status(400).send({ message: 'Invalid request' });
-    await connect(req, res);
+    try {
+        await connect(req, res);
+    } catch (e) {
+        console.log(`connection error: ${e} (${JSON.stringify(e)})`);
+        return res.status(400).send({ message: 'Invalid request' });
+    }
     const count = await visitorCount(req);
     render(req, res, subpath, {
         faucetUseCaptcha: count > 0,
@@ -141,6 +146,7 @@ const get = async (req: Request, res: Response, subpath: string): Promise<Respon
         faucetUsePass: config.faucetPassword ? true : false,
         explorerUrl: config.explorerUrl
     });
+    console.log('- request done');
 }
 
 // captcha
@@ -186,7 +192,11 @@ const makeClaim = async (params: MixedData, req: Request, res: Response): Promis
 
     const amount2 = await calcPayout();
     if (amount2 < amount) amount = amount2;
-    count = await visitorVisit(req, params, amount);
+    try {
+        count = await visitorVisit(req, params, amount);
+    } catch (e) {
+        return res.status(400).send({ message: 'Please slow down' });
+    }
     bitcoin.sendToAddress(address, sat2BTC(amount), async (err, result) => {
         console.log(`send ${amount} sats = ${sat2BTC(amount as number)} BTC to ${address} ${JSON.stringify(err)} ${JSON.stringify(result)}`);
         if (err) throw new Error('Internal error');

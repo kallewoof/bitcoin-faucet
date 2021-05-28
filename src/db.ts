@@ -1,7 +1,7 @@
 import { Db, MongoClient, ObjectID, SortOptionObject } from 'mongodb';
 import * as assert from 'assert';
 
-const config = require('./config'); // not ts
+import config from './config';
 
 const url = `mongodb://${config.mongoHost}:27017`;
 const dbname = 'bitcoin-faucet';
