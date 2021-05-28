@@ -59,6 +59,7 @@ typings/
 
 # next.js build output
 .next
-config.js
+config.ts
 package-lock.json
 .DS_Store
+built
