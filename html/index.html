@@ -58,14 +58,22 @@
                 },
                 error: function(err) {
                     sendButton.disabled = false;
-                    faucet_err(JSON.stringify(err));
+                    // {"readyState":4,
+                    //  "responseText":"{\"message\":\"Please slow down\"}",
+                    //  "responseJSON":{"message":"Please slow down"},
+                    //  "status":400,
+                    //  "statusText":"error"}
                     var msg = "";
                     if (err.status) {
                         msg += err.status + ": ";
                     }
+                    if (err.responseJSON && err.responseJSON.message) {
+                        msg += err.responseJSON.message;
+                        return faucet_err("Error: " + msg);
+                    }
                     if (err.responseText) {
                         msg += err.responseText;
-                        return faucet_err("Error: " + err.responseText);
+                        return faucet_err("Error: " + msg);
                     }
                     faucet_err(msg + JSON.stringify(err));
                 }
