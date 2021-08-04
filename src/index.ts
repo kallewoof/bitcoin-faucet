@@ -185,7 +185,7 @@ const makeClaim = async (params: MixedData, req: Request, res: Response): Promis
             }
             req.session.captcha = 'reload';
         } else {
-            return res.status(400).send("Captcha required (reload page)");
+            return res.status(429).send("Captcha required (reload page)");
         }
     }
 
@@ -194,7 +194,7 @@ const makeClaim = async (params: MixedData, req: Request, res: Response): Promis
     try {
         count = await visitorVisit(req, params, amount);
     } catch (e) {
-        return res.status(400).send({ message: 'Please slow down' });
+        return res.status(429).send({ message: 'Please slow down' });
     }
     bitcoin.sendToAddress(address, sat2BTC(amount), async (err, result) => {
         console.log(`send ${amount} sats = ${sat2BTC(amount as number)} BTC to ${address} ${JSON.stringify(err)} ${JSON.stringify(result)}`);
