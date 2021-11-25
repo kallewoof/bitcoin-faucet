@@ -79,6 +79,10 @@
                 }
             });
         }
+        function readyFn( jQuery ) {
+          $('#address').focus();
+        }
+        $(window).on("load", readyFn);
         </script>
 </head>
 
