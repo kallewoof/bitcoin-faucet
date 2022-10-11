@@ -1,38 +1,17 @@
-# Based on Blockstream's esplora project
-
-FROM debian:stretch-slim
-
-# TODO: weed out unnecessary deps
-RUN apt-get -yq update \
-    && apt-get -yq install \
-        curl
-
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-
-RUN apt-get -yq install nodejs
-
-RUN mkdir -p /srv/faucet
-
-COPY ./ /srv/faucet
+FROM node:18-alpine
 
 WORKDIR /srv/faucet
 
-SHELL ["/bin/bash", "-c"]
+COPY ./ /srv/faucet
 
-# required to run some scripts as root (needed for docker)
 RUN npm config set unsafe-perm true \
- && npm install
-
-# cleanup
-RUN apt-get --auto-remove remove -y --purge manpages git \
- && apt-get clean \
- && apt-get autoclean \
- && rm -rf /usr/share/doc* /usr/share/man /usr/share/postgresql/*/man /var/lib/apt/lists/* /var/cache/* /tmp/* /root/.cache /*.deb /root/.cargo
+ && npm install \
+ && npm install -g ts-node @types/node@15.6.1 typescript@4.3.2
 
 ENV FAUCET_NAME="Signet Faucet"
 
-COPY config.example.js config.js
+COPY src/config.example.ts src/config.ts
 
 EXPOSE 8123
 
-CMD ["./index.js"]
+CMD ["npm", "start"]

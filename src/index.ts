@@ -61,17 +61,17 @@ const check = async (req: Request, _res: Response) => {
 
 const render = (_req: Request, res: Response, filebasename: string, data: MixedData) => {
     const filename = `../html/${filebasename.includes('.') ? filebasename : `${filebasename}.html`}`;
-    if (!fs.existsSync(filename)) {
-        res.status(400).send({ message: 'file not found' });
+    if (!fs.existsSync(path.join(`${__dirname}/${filename}`))) {
+        res.status(404).send({ message: 'file not found' });
         return;
     }
     if (filename.endsWith('.html')) {
-        ejs.renderFile(filename, data || {}, {}, (err, html) => {
+        ejs.renderFile(path.join(`${__dirname}/${filename}`), data || {}, {}, (err, html) => {
             if (err) {
                 console.log(`ejs.renderFile ERROR for ${filename}: ${JSON.stringify(err)}`);
                 console.log(err);
                 console.log(`data = ${JSON.stringify(data)}`);
-                res.status(400).send('Internal error (rendering failure)');
+                res.status(500).send('Internal error (rendering failure)');
                 return;
             }
             res.send(html);
@@ -89,20 +89,14 @@ const connect = async (req: Request, res: Response) => {
 
 const calcPayout = async () => claim.calc_amount();
 
-let visitorCount: (req: Request) => Promise<number>;
 let visitorVisit: (req: Request, params: MixedData, weight?: number) => Promise<number>;
 if (config.faucetPassword) {
-    visitorCount = async (_req: Request) => 0;
     visitorVisit = async (_req: Request, params: MixedData, _weight?: number) => {
         const { password } = params;
         if (password !== config.faucetPassword) throw new Error("invalid password");
         return 0;
     };
 } else {
-    visitorCount = async (req: Request) => {
-        const rl: rlf.RateLimiterRes | null = await rlfFaucet.get(req.headers["x-real-ip"] as string);
-        return rl ? rl.consumedPoints : 0;
-    }
     visitorVisit = async (req: Request, _params: MixedData, weight?: number) => {
         const addr = req.headers["x-real-ip"] as string;
         await rlfGlob.consume(addr, 1);
@@ -139,9 +133,8 @@ const get = async (req: Request, res: Response, subpath: string): Promise<Respon
         console.log(`connection error: ${e} (${JSON.stringify(e)})`);
         return res.status(400).send({ message: 'Invalid request' });
     }
-    const count = await visitorCount(req);
     render(req, res, subpath, {
-        faucetUseCaptcha: count > 0,
+        faucetUseCaptcha: config.faucetCaptcha == 'true' ? true : false,
         faucetName: config.faucetName,
         faucetUsePass: config.faucetPassword ? true : false,
         explorerUrl: config.explorerUrl
@@ -175,9 +168,7 @@ const makeClaim = async (params: MixedData, req: Request, res: Response): Promis
     if (!amount) amount = "0.001";
     amount = btcString2Sat(amount);
     if (amount < 100000 || amount > 10000000) return res.status(400).send('Please check your amount and try again.');
-    let count = await visitorCount(req);
-    const requireCaptcha = count > 0;
-    if (requireCaptcha) {
+    if (config.faucetCaptcha == 'true') {
         if (req.session.captcha) {
             if (req.session.captcha === 'reload') return res.status(400).send("Captcha expired; please reload")
             if (params.captcha !== req.session.captcha) {
@@ -192,7 +183,7 @@ const makeClaim = async (params: MixedData, req: Request, res: Response): Promis
     const amount2 = await calcPayout();
     if (amount2 < amount) amount = amount2;
     try {
-        count = await visitorVisit(req, params, amount);
+        await visitorVisit(req, params, amount);
     } catch (e) {
         return res.status(429).send({ message: 'Please slow down' });
     }

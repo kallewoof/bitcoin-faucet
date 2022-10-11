@@ -1,6 +1,6 @@
 {
   "name": "bitcoin-faucet",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Simple Bitcoin Faucet",
   "main": "built/index.js",
   "scripts": {
@@ -25,10 +25,10 @@
     "@types/ejs": "^3.0.6",
     "@types/express": "^4.17.12",
     "@types/express-session": "^1.17.3",
-    "@types/mongodb": "^3.6.16",
+    "@types/mongodb": "^3.6.20",
     "@types/node": "^15.6.1",
     "bcrpc": "^0.2.1",
-    "ejs": "^2.6.2",
+    "ejs": "^3.1.8",
     "express": "^4.17.1",
     "express-session": "^1.16.2",
     "mongodb": "^3.2.7",
