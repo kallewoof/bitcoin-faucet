@@ -18,6 +18,7 @@ MAX_PER_TX=500
 BTC_PER_TX=decimal.Decimal("1.0")
 BTC_PER_OUT=decimal.Decimal("0.1")
 QUANTIZE=decimal.Decimal(10)**-5
+BTC_MIN = decimal.Decimal("0.00001")
 
 FILE_IN = "payouts.txt"
 FILE_WORK = "payouts-processing.txt"
@@ -40,6 +41,16 @@ def filesize(path):
         return os.stat(path).st_size
     except:
         return 0
+
+def ok_amount(amt):
+    try:
+        d = decimal.Decimal(amt)
+        if not d.is_finite(): return False
+        if d > 10*BTC_PER_TX: return False
+        if d < BTC_MIN: return False
+        return True
+    except:
+        return False
 
 def main():
     ips = set()
@@ -66,6 +77,7 @@ def main():
                             w.write(line)
                             continue
                         address, amount, ip = line.strip().split(" ")
+                        if not ok_amount(amount): continue
                         if ip in ips: continue
                         if ip in dupe_ip: continue
                         if address in addresses: continue
