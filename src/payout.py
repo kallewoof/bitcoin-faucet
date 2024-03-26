@@ -19,6 +19,10 @@ BTC_PER_TX=decimal.Decimal("1.0")
 BTC_PER_OUT=decimal.Decimal("0.1")
 QUANTIZE=decimal.Decimal(10)**-5
 
+FILE_IN = "payouts.txt"
+FILE_WORK = "payouts-processing.txt"
+FILE_NEXT = "payouts-processing.tmp"
+
 class Entry:
     def __init__(self, address, amount, ip):
         self.address = address
@@ -31,25 +35,36 @@ class Entry:
     def __repr__(self):
         return f"{self.address} {self.amount} {self.ip}"
 
+def filesize(path):
+    try:
+        return os.stat(path).st_size
+    except:
+        return 0
+
 def main():
     ips = set()
     addresses = set()
 
     while True:
         # Process existing file, if any
-        if os.path.exists("payouts-processing.txt"):
+        if os.path.exists(FILE_WORK):
             done = False
             while not done:
                 # Sleep for 5 seconds
-                print(f"{time.ctime()}: Sleeping for 30 seconds")
+                print(f"{time.ctime()}: Sleeping for 30 seconds (IN: {filesize(FILE_IN)}, WORK: {filesize(FILE_WORK)})")
                 time.sleep(30)
 
                 # Read next entry
                 requests = []
-                with open("payouts-processing.txt", "r") as f:
+                with open(FILE_WORK, "r") as f, open(FILE_NEXT, "w") as w:
                     dupe_addr = set()
                     dupe_ip = set()
+                    w.write("")
                     for line in f:
+                        if len(requests) >= MAX_PER_TX:
+                            # save these for later
+                            w.write(line)
+                            continue
                         address, amount, ip = line.strip().split(" ")
                         if ip in ips: continue
                         if ip in dupe_ip: continue
@@ -60,16 +75,16 @@ def main():
                         res = subprocess.run(f"{CMD} getaddressinfo {address}", capture_output=True, shell=True, encoding='utf8')
                         if res.returncode != 0 or "scriptPubKey" not in json.loads(res.stdout): continue
                         requests.append(Entry(address, amount, ip))
+
                 if not requests:
                     done = True
                 else:
-                    entries, requests = requests[:MAX_PER_TX], requests[MAX_PER_TX:]
-                    amount = min(BTC_PER_OUT, (BTC_PER_TX/len(entries)).quantize(QUANTIZE, rounding=decimal.ROUND_DOWN))
+                    amount = min(BTC_PER_OUT, (BTC_PER_TX/len(requests)).quantize(QUANTIZE, rounding=decimal.ROUND_DOWN))
                     proc = subprocess.Popen(f"{CMD} -stdin createrawtransaction", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, encoding='utf8')
                     proc.stdin.write("[]\n") # inputs
                     proc.stdin.write("[") # outputs
                     comma = ""
-                    for entry in entries:
+                    for entry in requests:
                         if entry.address in addresses: continue
                         print(f"{time.ctime()}: {entry} ({amount})")
                         ips.add(entry.ip)
@@ -91,17 +106,13 @@ def main():
 
                     subprocess.run(f"{CMD} -stdin sendrawtransaction", input=signed, shell=True, encoding='utf8')
 
-                    # Read remainder into payouts w
-                    with open("payouts-processing.tmp", "w") as w:
-                        for e in requests:
-                            w.write(str(e) + "\n")
-                    # Replace processing file
-                    os.system("mv payouts-processing.tmp payouts-processing.txt")
+                # Replace processing file
+                os.rename(FILE_NEXT, FILE_WORK)
         # Wait for the file to appear
-        while not os.path.exists("payouts.txt"):
+        while not os.path.exists(FILE_IN):
             time.sleep(5)
         # Move the file for processing
-        os.system("mv payouts.txt payouts-processing.txt")
+        os.rename(FILE_IN, FILE_WORK)
 
 if __name__ == "__main__":
     main()
